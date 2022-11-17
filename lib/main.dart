@@ -84,19 +84,15 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
         },
         child: Stack(
           children: [
-            SizedBox(
-                width: Helper(context).scaledScreenWidth(1),
-                height: Helper(context).scaledScreenHeight(1),
-                child: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.rotationY(math.pi),
-                    child: CameraPreview(_cameraController))),
             Center(
-              child: Icon(
-                Icons.face_outlined,
-                size: Helper(context).scaledScreenWidth(1),
-              ),
+              child: SizedBox(
+                  width: Helper(context).scaledScreenWidth(1),
+                  child: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationY(math.pi),
+                      child: CameraPreview(_cameraController))),
             ),
+            const ImageCropper(isView: false),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -160,10 +156,10 @@ class TakePhotoResultPage extends StatelessWidget {
         ),
         body: Stack(
           children: [
-            SizedBox(
-                width: Helper(context).scaledScreenWidth(1),
-                height: Helper(context).scaledScreenHeight(1),
-                child: Image.file(File(imagePath), fit: BoxFit.fitHeight)),
+            Center(
+                child: Expanded(
+                    child: Image.file(File(imagePath), fit: BoxFit.fitHeight))),
+            const ImageCropper(isView: true),
             Align(
                 alignment: Alignment.bottomCenter,
                 child: _guideBoxAtBottom(context))
@@ -190,5 +186,41 @@ class Helper {
     double result;
     result = height * MediaQuery.of(context).size.height;
     return result;
+  }
+}
+
+class ImageCropper extends StatelessWidget {
+  final bool isView;
+  const ImageCropper({required this.isView, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ColorFiltered(
+      colorFilter: ColorFilter.mode(
+          isView ? Colors.white : Colors.black.withOpacity(0.8),
+          BlendMode.srcOut), // This one will create the magic
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+                color: Colors.black,
+                backgroundBlendMode: BlendMode
+                    .dstOut), // This one will handle background + difference out
+          ),
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 80),
+              height: 300,
+              width: 300,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
