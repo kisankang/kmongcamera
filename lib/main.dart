@@ -92,7 +92,7 @@ class _TakePhotoPageState extends State<TakePhotoPage> {
                       transform: Matrix4.rotationY(math.pi),
                       child: CameraPreview(_cameraController))),
             ),
-            const ImageCropper(isView: false),
+            ImageCropper(isView: false, shape: 1),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -156,10 +156,11 @@ class TakePhotoResultPage extends StatelessWidget {
         ),
         body: Stack(
           children: [
-            Center(
-                child: Expanded(
-                    child: Image.file(File(imagePath), fit: BoxFit.fitHeight))),
-            const ImageCropper(isView: true),
+            Center(child: Image.file(File(imagePath), fit: BoxFit.fitHeight)),
+            ImageCropper(
+              isView: true,
+              shape: 1,
+            ),
             Align(
                 alignment: Alignment.bottomCenter,
                 child: _guideBoxAtBottom(context))
@@ -191,7 +192,8 @@ class Helper {
 
 class ImageCropper extends StatelessWidget {
   final bool isView;
-  const ImageCropper({required this.isView, super.key});
+  final int shape;
+  const ImageCropper({required this.shape, required this.isView, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -213,8 +215,8 @@ class ImageCropper extends StatelessWidget {
               margin: const EdgeInsets.only(top: 80),
               height: 300,
               width: 300,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
+              decoration: BoxDecoration(
+                shape: shape == 1 ? BoxShape.circle : BoxShape.rectangle,
                 color: Colors.red,
               ),
             ),
